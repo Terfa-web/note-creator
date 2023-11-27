@@ -1,40 +1,65 @@
 const notesContainer = document.querySelector('.notes-container');
 const createBtn = document.querySelector('.btn');
 
-function showNotes(){
-  notesContainer.innerHTML = localStorage.getItem('notes')
+let staleNotes = localStorage.getItem('notes')
+window.addEventListener('load', () => {
+ 
+  if(staleNotes.length > 0) {
+    renderPage()
+    
+  }
+})
+
+function renderPage() {
+  
+  let inputBox = document.createElement('p');
+  let img = document.createElement('img');
+  inputBox.className = 'input-box';
+  inputBox.setAttribute('contenteditable', 'true');
+  img.src = 'images/delete.png';
+  inputBox.textContent = staleNotes
+  notesContainer.appendChild(inputBox).appendChild(img);
+  
 }
-showNotes();
 function updateStorage(){
-  localStorage.setItem('notes', notesContainer.innerHTML)
+  localStorage.setItem('notes', notesContainer.textContent)
 }
 
 let notes = document.querySelectorAll('.input-box')
 
 createBtn.addEventListener('click', () => {
+  renderNewPage()
+  
+  
+})
+
+function renderNewPage() {
   let inputBox = document.createElement('p');
   let img = document.createElement('img');
   inputBox.className = 'input-box';
   inputBox.setAttribute('contenteditable', 'true');
   img.src = 'images/delete.png';
   notesContainer.appendChild(inputBox).appendChild(img);
-  inputBox.style.display = 'block';
-  inputBox.focus()
-})
-
-notesContainer.addEventListener('click', (e)=> {
+}
+notesContainer.addEventListener('click', function(e){
   if(e.target.tagName === 'IMG') {
-    
+    updateStorage();
     e.target.parentElement.remove();
-    updateStorage()
+    
   }
-  if(e.target.tagName === 'P'){
-    notes = document.querySelectorAll('.input-box')
+  else if(e.target.tagName === 'P'){
+    notes = document.querySelectorAll('.input-box');
 
     notes.forEach(note => {
-      note.onKeyUp = function() {
+      note.onkeyUp = function() {
           updateStorage()
       }
     })
   }
+})
+
+document.addEventListener('keydown', event => {
+  if(event.key === 'Enter')
+    document.execCommand('insertLineBreak');
+    event.preventDefault();
 })
